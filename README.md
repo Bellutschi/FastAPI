@@ -8,3 +8,6 @@
 
  ## Installieren der requirements
  python -m pip install -r requirements.txt
+
+ ## Hinzufügen des ssh-Agenten im Terminal
+ start-ssh-agent

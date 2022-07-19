@@ -1,1 +1,10 @@
-# FastAPI
+# 
+
+## Aktivieren der virtuellen Environment
+ .\venv\Scripts\activate
+
+ ## Speichern der imports in requirements
+ python -m pip freeze > requirements.txt
+
+ ## Installieren der requirements
+ python -m pip install -r requirements.txt

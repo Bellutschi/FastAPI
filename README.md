@@ -1,5 +1,3 @@
-# 
-
 ## Aktivieren der virtuellen Environment
  .\venv\Scripts\activate
 
@@ -11,3 +9,6 @@
 
  ## Hinzufügen des ssh-Agenten im Terminal
  start-ssh-agent
+
+ ## Aufrufen der API-Doku
+ url:port/docs

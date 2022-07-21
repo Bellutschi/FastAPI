@@ -23,6 +23,11 @@ def find_post(id):
         if p["id"] == id:
             return p
 
+def find_index_post(id):
+    for i,p in enumerate(my_posts):
+        if p["id"] == id:
+            return i
+
 # app.get() als path operation decorator 
 # http request get als operation
 # "/" als path bzw. route
@@ -50,6 +55,7 @@ def get_post(id: int, response: Response):
     print(id)
     return {"post_detail": post}
 
+# status_code Parameter wird gesetzt
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 # Body liest den request body aus
 #def create_posts(payload: dict = Body(...)):
@@ -68,6 +74,17 @@ def create_posts(new_post: Post):
     post_dict["id"] = randrange(0,100000)
     my_posts.append(post_dict)
     return {"data": post_dict}
+
+
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+    index = find_index_post(id)
+
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
+        
+    my_posts.pop(index)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
     
 
 

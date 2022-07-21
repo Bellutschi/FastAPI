@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, Response, status, HTTPException
 import uvicorn
 from pydantic import BaseModel # schema validation
 from random import randrange
@@ -39,12 +39,19 @@ def get_posts():
 # path parameter id in url wird extrahiert
 # VORSICHT!!! path parameter könnte mit einem anderen path matchen (z.B. /posts/latest)
 @app.get("/posts/{id}")
-def get_post(id: int):
+def get_post(id: int, response: Response):
+
     post = find_post(id)
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
+        # gleiche Vorgehensweise
+        #response.status_code = status.HTTP_404_NOT_FOUND
+        #return {"message": f"post with id: {id} was not found"}
     print(id)
     return {"post_detail": post}
 
-@app.post("/posts")
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+# Body liest den request body aus
 #def create_posts(payload: dict = Body(...)):
     #print(payload)
     #return {"new_post": f"title {payload['title']} content {payload['content']}"}

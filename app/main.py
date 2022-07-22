@@ -3,6 +3,9 @@ from fastapi import Body, FastAPI, Response, status, HTTPException
 import uvicorn
 from pydantic import BaseModel # schema validation
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
 
 app = FastAPI()
 
@@ -13,7 +16,19 @@ class Post(BaseModel):
     content: str
     published: bool = True
     # does the same thing as just default values
-    rating: Optional[int] = None
+    # rating: Optional[int] = None
+
+while True:
+    try:
+        # RealDictCursor gibt columns und values aus
+        conn = psycopg2.connect(host='localhost', database='api', user='postgres', password='kira', cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+        print("Database connection was succesfull!")
+        break
+    except Exception as error:
+        print("Connecting to database failed")
+        print("Error:", error)
+        time.sleep(2)
 
 # database placeholder
 my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, {"title": "favourite foods", "content": "Pizza", "id": 2}]
@@ -103,4 +118,4 @@ def update_post(id: int, post: Post):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=30000, reload=True)
+    uvicorn.run("main:app", host="localhost", port=30000, reload=True)

@@ -30,18 +30,7 @@ while True:
         print("Error:", error)
         time.sleep(2)
 
-# database placeholder
-my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, {"title": "favourite foods", "content": "Pizza", "id": 2}]
 
-def find_post(id):
-    for p in my_posts:
-        if p["id"] == id:
-            return p
-
-def find_index_post(id):
-    for i,p in enumerate(my_posts):
-        if p["id"] == id:
-            return i
 
 # app.get() als path operation decorator 
 # http request get als operation
@@ -54,14 +43,18 @@ def root():
 
 @app.get("/posts")
 def get_posts():
-    return {"data": my_posts}
+    cursor.execute(""" SELECT * FROM posts """)
+    posts = cursor.fetchall()
+    return {"data": posts}
 
 # path parameter id in url wird extrahiert
 # VORSICHT!!! path parameter könnte mit einem anderen path matchen (z.B. /posts/latest)
 @app.get("/posts/{id}")
 def get_post(id: int, response: Response):
 
-    post = find_post(id)
+    cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (str(id)))
+    post = cursor.fetchone()
+
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
         # gleiche Vorgehensweise
@@ -80,40 +73,39 @@ def get_post(id: int, response: Response):
 # parameter gets the pydantic model Post as validation schema
 # In Post wird der request body validiert und abgespeichert
 def create_posts(new_post: Post):
-    print(new_post)
-    print(new_post.title)
-    print(new_post.published)
-    print(new_post.rating)
-    print(new_post.dict())
-    post_dict = new_post.dict()
-    post_dict["id"] = randrange(0,100000)
-    my_posts.append(post_dict)
-    return {"data": post_dict}
+
+    # nicht mit f-String arbeiten, weil für SQL-Injection anfaellig
+    cursor.execute(f""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (new_post.title, new_post.content, new_post.published))
+    new_post = cursor.fetchone()
+    conn.commit()
+    
+    return {"data": new_post}
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    index = find_index_post(id)
 
-    if index == None:
+    cursor.execute(""" DELETE FROM posts WHERE id = %s returning * """, (str(id)))
+    deleted_post = cursor.fetchone()
+    conn.commit()
+
+    if deleted_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
 
-    my_posts.pop(index)
+    
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
-    print(post)
-    index = find_index_post(id)
-
-    if index == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
     
-    post_dict = post.dict()
-    post_dict['id'] = id
-    my_posts[index] = post_dict
+    cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING * """, (post.title, post.content, post.published, str(id)))
+    updated_post = cursor.fetchone()
+    conn.commit()
 
-    return {"data": post_dict}
+    if updated_post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
+
+    return {"data": updated_post}
     
 
 

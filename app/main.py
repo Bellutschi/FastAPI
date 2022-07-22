@@ -7,7 +7,7 @@ from random import randrange
 app = FastAPI()
 
 # class for schema validation; inherits from pydantic
-# checks the values in body for the data types in class Post
+# checks the values in body for the data types in class Post (trys to cast the specified datatype)
 class Post(BaseModel):
     title: str
     content: str
@@ -15,7 +15,7 @@ class Post(BaseModel):
     # does the same thing as just default values
     rating: Optional[int] = None
 
-
+# database placeholder
 my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, {"title": "favourite foods", "content": "Pizza", "id": 2}]
 
 def find_post(id):
@@ -103,4 +103,4 @@ def update_post(id: int, post: Post):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=30000, reload=True)

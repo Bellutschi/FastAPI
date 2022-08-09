@@ -6,6 +6,10 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from . import models
+from .database import engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -21,6 +25,7 @@ class Post(BaseModel):
 while True:
     try:
         # RealDictCursor gibt columns und values aus
+        # psycopg2 Database Driver for postgres
         conn = psycopg2.connect(host='localhost', database='api', user='postgres', password='kira', cursor_factory=RealDictCursor)
         cursor = conn.cursor()
         print("Database connection was succesfull!")
@@ -110,4 +115,4 @@ def update_post(id: int, post: Post):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="localhost", port=30000, reload=True)
+    uvicorn.run("main_orm:app", host="localhost", port=30000, reload=True)

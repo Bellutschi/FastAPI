@@ -6,7 +6,7 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
-import models
+import models, schemas
 from database import engine, get_db
 from sqlalchemy.orm import Session
 
@@ -15,13 +15,6 @@ from sqlalchemy.orm import Session
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-
 
 
 @app.get("/")
@@ -51,7 +44,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(new_post: Post, db: Session = Depends(get_db)):
+def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
     #new_post = models.Post(title=new_post.title, content=new_post.content, published=new_post.published)
     new_post = models.Post(**new_post.dict())
     db.add(new_post)
@@ -77,7 +70,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
     if post_query.first() == None:
@@ -85,7 +78,7 @@ def update_post(id: int, post: Post, db: Session = Depends(get_db)):
 
     post_query.update(post.dict(), synchronize_session=False)
     db.commit()
-    
+
     return {"data": post_query.first()}
     
 

@@ -6,17 +6,10 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+import schemas
 
 app = FastAPI()
 
-# class for schema validation; inherits from pydantic
-# checks the values in body for the data types in class Post (trys to cast the specified datatype)
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    # does the same thing as just default values
-    # rating: Optional[int] = None
 
 while True:
     try:
@@ -73,7 +66,7 @@ def get_post(id: int, response: Response):
 
 # parameter gets the pydantic model Post as validation schema
 # In Post wird der request body validiert und abgespeichert
-def create_posts(new_post: Post):
+def create_posts(new_post: schemas.PostCreate):
 
     # nicht mit f-String arbeiten, weil für SQL-Injection anfaellig
     cursor.execute(f""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (new_post.title, new_post.content, new_post.published))
@@ -97,7 +90,7 @@ def delete_post(id: int):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post):
+def update_post(id: int, post: schemas.PostCreate):
     
     cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING * """, (post.title, post.content, post.published, str(id)))
     updated_post = cursor.fetchone()

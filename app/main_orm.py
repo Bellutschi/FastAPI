@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import Body, FastAPI, Response, status, HTTPException, Depends
 import uvicorn
 from pydantic import BaseModel # schema validation
@@ -23,15 +23,15 @@ def root():
     return {"message": "Hello world!"}
 
 
-
-@app.get("/posts")
+# response_model ist das pydantic schmea für die response; Sonderfall List gibt eine Liste vom Schema aus
+@app.get("/posts", response_model=List[schemas.PostResponse])
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return posts
 
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schemas.PostResponse)
 def get_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     
@@ -43,7 +43,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
     #new_post = models.Post(title=new_post.title, content=new_post.content, published=new_post.published)
     new_post = models.Post(**new_post.dict())
@@ -69,7 +69,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}", response_model=schemas.PostResponse)
 def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
 

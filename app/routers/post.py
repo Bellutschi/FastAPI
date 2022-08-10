@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from typing import Optional, List
 
-router = APIRouter(prefix="/posts")
+router = APIRouter(prefix="/posts", tags=['Posts'])
 
 
 # response_model ist das pydantic schmea für die response; Sonderfall List gibt eine Liste vom Schema aus

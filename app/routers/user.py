@@ -5,7 +5,8 @@ from database import get_db
 
 # router stellen eine Verbindung zur Haupt-App her
 # prefix wird verwendet, wenn mehrere URL das gleiche prefix haben 
-router = APIRouter(prefix="/users")
+# tags gruppiert die requests in der automatischen Doku
+router = APIRouter(prefix="/users", tags=['Users'])
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):

@@ -1,4 +1,3 @@
-from email.policy import default
 from database import Base
 from sqlalchemy import TIMESTAMP, Column, Integer, String, Boolean, text
 

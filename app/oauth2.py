@@ -4,7 +4,8 @@ import schemas
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-
+# contains the URL that the client will use to send the username and password in order to get a token
+# use this in dependency to define a "security scheme"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 # secret key = verifys the server authentification (access to server)
@@ -46,6 +47,7 @@ def verify_access_token(token: str, credentials_exception):
     return token_data
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
+    #  to authenticate with our API, it sends a header Authorization with a value of Bearer plus the token
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     
     return verify_access_token(token, credentials_exception)

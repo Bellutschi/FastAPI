@@ -4,7 +4,8 @@ import schemas
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-oauth2_scheme = OAuth2PasswordBearer(tokenURL='login')
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 # secret key = verifys the server authentification (access to server)
 # to get a string like this run in bash:
@@ -21,7 +22,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 def create_access_tokens(data: dict):
     to_encode = data.copy()
 
-    expire = datetime.datetime.now() + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
 
@@ -32,8 +33,8 @@ def create_access_tokens(data: dict):
 
 def verify_access_token(token: str, credentials_exception):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        id: str = payload.get("users_id")
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        id: str = payload.get("user_id")
 
         if id is None:
             raise credentials_exception
@@ -41,6 +42,8 @@ def verify_access_token(token: str, credentials_exception):
         token_data = schemas.TokenData(id=id)
     except JWTError:
         raise credentials_exception
+
+    return token_data
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})

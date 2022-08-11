@@ -3,6 +3,7 @@ import models, schemas, utils
 from sqlalchemy.orm import Session
 from database import get_db
 from typing import Optional, List
+import oauth2
 
 router = APIRouter(prefix="/posts", tags=['Posts'])
 
@@ -28,7 +29,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
-def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db), get_current_user: int = Depends(oauth2.get_current_user)):
     #new_post = models.Post(title=new_post.title, content=new_post.content, published=new_post.published)
     new_post = models.Post(**new_post.dict())
     db.add(new_post)

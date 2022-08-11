@@ -10,15 +10,15 @@ router = APIRouter(prefix="/posts", tags=['Posts'])
 
 # response_model ist das pydantic schmea für die response; Sonderfall List gibt eine Liste vom Schema aus
 @router.get("/", response_model=List[schemas.PostResponse])
-# Depends(oauth2.get_current_user) Dependancy, das im Authorization Header Bearer Token steht (Authorization)
-def get_posts(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+# Depends(oauth2.get_current_user) Dependancy, das im Authorization Header "Bearer Token" steht
+def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     posts = db.query(models.Post).all()
     return posts
 
 
 
 @router.get("/{id}", response_model=schemas.PostResponse)
-def get_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     
     if not post:
@@ -30,19 +30,19 @@ def get_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oaut
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
-def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def create_posts(new_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     #new_post = models.Post(title=new_post.title, content=new_post.content, published=new_post.published)
     new_post = models.Post(**new_post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    print(user_id)
+    
     return new_post
 
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(models.Post.id == id)
 
     if post.first() == None:
@@ -56,7 +56,7 @@ def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(o
 
 
 @router.put("/{id}", response_model=schemas.PostResponse)
-def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
     if post_query.first() == None:

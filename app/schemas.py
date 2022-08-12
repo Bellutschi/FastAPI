@@ -22,6 +22,7 @@ class PostCreate(PostBase):
 class PostResponse(PostBase):
     id: int
     created_at: datetime
+    owner_id: int
 
     # casts the sqlalchemy into pydantic
     class Config:

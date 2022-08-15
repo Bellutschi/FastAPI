@@ -11,6 +11,7 @@ router = APIRouter(prefix="/posts", tags=['Posts'])
 # response_model ist das pydantic schmea für die response; Sonderfall List gibt eine Liste vom Schema aus
 @router.get("/", response_model=List[schemas.PostResponse])
 # Depends(oauth2.get_current_user) Dependancy, das im Authorization Header "Bearer Token" steht
+# limit, skip, search sind url querys ( Aufrufen mit ?parameter)
 def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts

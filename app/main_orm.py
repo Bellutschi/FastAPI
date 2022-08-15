@@ -3,6 +3,7 @@ import uvicorn
 import models
 from database import engine
 from routers import post, user, auth
+from config import settings
 
 # creates all tables stored in Base.metadata
 # if __table_name__ is available it doesnt create table

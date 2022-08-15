@@ -17,12 +17,19 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
 
+    class Config:
+        orm_mode = True
 
 class PostResponse(PostBase):
     id: int
     created_at: datetime
     owner_id: int
+    owner: UserOut
 
     # casts the sqlalchemy into pydantic
     class Config:
@@ -36,13 +43,7 @@ class UserCreate(BaseModel):
 
 
 
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr
-    created_at: datetime
 
-    class Config:
-        orm_mode = True
 
 
 

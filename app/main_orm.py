@@ -24,4 +24,4 @@ def root():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main_orm:app", host="localhost", port=30000, reload=True)
+    uvicorn.run("main_orm:app", host=settings.database_hostname, port=settings.database_port, reload=True)

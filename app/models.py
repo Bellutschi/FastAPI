@@ -33,6 +33,6 @@ class User(Base):
 class Vote(Base):
     __tablename__ = "votes"
 
-    # Composite primare key of 2 columns
+    # Composite primary key of 2 columns
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)

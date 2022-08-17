@@ -35,6 +35,22 @@ class PostResponse(PostBase):
     class Config:
         orm_mode = True
 
+class PostVote(BaseModel):
+    id: int
+    published: bool = True
+    title: str
+    owner_id: int
+    content: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class PostOut(BaseModel):
+    id: int
+    votes: int
+
 
 
 class UserCreate(BaseModel):

@@ -12,3 +12,6 @@
 
  ## Aufrufen der API-Doku
  url:port/docs
+
+ ## Einrichten des Database-Migration-Tool alembic
+ Eingabe terminal: alembic init alembic
